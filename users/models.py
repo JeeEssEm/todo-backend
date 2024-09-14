@@ -12,6 +12,7 @@ class User(Base):
     email = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
     username = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
     password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    token_date_valid = sqlalchemy.Column(sqlalchemy.DateTime)
 
     teams = sqlalchemy.orm.relationship('Team', secondary=UsersTeams,
                                         back_populates='users')

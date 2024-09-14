@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from core.security import get_password_hash
 from models import User
 import sqlalchemy
+import datetime as dt
 
 
 class UserCRUD:
@@ -40,5 +41,6 @@ class UserCRUD:
     @staticmethod
     def change_password(session: Session, password: str, user):
         user.password = get_password_hash(password)
+        user.token_date_valid = dt.datetime.utcnow()
         session.add(user)
         session.commit()

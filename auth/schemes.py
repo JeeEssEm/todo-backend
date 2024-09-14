@@ -19,11 +19,12 @@ class RegisterForm(pydantic.BaseModel):
     @classmethod
     def validate_password(cls, v):
         expression = re.compile(
-            '^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$'
+            r'^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$'
         )
         if not expression.match(v):
-            raise ValueError('''Password must contain: at least 1 uppercase 
-            letter, special symbol and 1 digit''')
+            raise ValueError(
+                'Password must contain: at least 1 uppercase letter, '
+                'special symbol and 1 digit')
         return v
 
 
@@ -42,9 +43,10 @@ class ResetPasswordForm(pydantic.BaseModel):
     @classmethod
     def validate_password(cls, v):
         expression = re.compile(
-            '^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$'
+            r'^.*(?=.{8,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$'
         )
         if not expression.match(v):
-            raise ValueError('''Password must contain: at least 1 uppercase 
-            letter, special symbol and 1 digit''')
+            raise ValueError(
+                'Password must contain: at least 1 uppercase letter, '
+                'special symbol and 1 digit')
         return v

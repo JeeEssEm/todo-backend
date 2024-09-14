@@ -5,6 +5,6 @@ class Base(sqlalchemy.orm.DeclarativeBase):
     pass
 
 
-from teams.models import *
-from users.models import *
-from tasks.models import *
+from teams.models import *  # noqa
+from users.models import *  # noqa
+from tasks.models import *  # noqa

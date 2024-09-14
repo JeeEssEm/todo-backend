@@ -48,7 +48,10 @@ async def update_token(request: fastapi.Request, response: fastapi.Response,
                        db: Session = fastapi.Depends(get_db)):
     refresh_token = request.cookies.get('refresh_token')
 
-    if core.security.is_valid_token(refresh_token):
+    try:
+        token = core.security.decode_token(refresh_token)
+        if token.get('type') != 'refresh':
+            raise Exception('Invalid token')
         current_user = await get_current_user(refresh_token, db)
         tokens = core.security.create_tokens(current_user.id)
         response.headers['Authorization'] = f'Bearer {tokens["access_token"]}'
@@ -56,11 +59,11 @@ async def update_token(request: fastapi.Request, response: fastapi.Response,
             'access_token': tokens['access_token'],
             'token_type': 'bearer'
         }
-
-    raise fastapi.exceptions.HTTPException(
-        status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
-        detail='Invalid token or token expired'
-    )
+    except Exception:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail='Invalid token or token expired'
+        )
 
 
 @router.post(
@@ -88,4 +91,5 @@ async def reset_password(
     form: Annotated[schemes.ResetPasswordForm, fastapi.Depends()]
 ):
     UserCRUD.change_password(db, form.password, current_user)
+
     return Response(detail='Password changed successfully!')
