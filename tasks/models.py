@@ -8,24 +8,13 @@ class TaskStatus(enum.Enum):
     running = 'running'
     done = 'done'
     archived = 'archived'
+    cancelled = 'cancelled'
 
 
 class TaskImportance(enum.IntEnum):
     regular = 1
     important = 2
     extremely_important = 3
-
-
-TasksTeams = sqlalchemy.Table(
-    'TasksTeams',
-    Base.metadata,
-    sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True,
-                      index=True, autoincrement=True, nullable=False),
-    sqlalchemy.Column('task_id',
-                      sqlalchemy.Integer, sqlalchemy.ForeignKey('Task.id')),
-    sqlalchemy.Column('team_id',
-                      sqlalchemy.Integer, sqlalchemy.ForeignKey('Team.id')),
-)
 
 
 class Task(Base):
@@ -35,11 +24,16 @@ class Task(Base):
                            index=True, autoincrement=True, nullable=False)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     description = sqlalchemy.Column(sqlalchemy.Text)
-    status = sqlalchemy.Column(sqlalchemy.Enum, nullable=False)
-    importance = sqlalchemy.Column(sqlalchemy.Enum, nullable=False)
+    status = sqlalchemy.Column(sqlalchemy.Enum(TaskStatus), nullable=False)
+    importance = sqlalchemy.Column(sqlalchemy.Enum(TaskImportance),
+                                   nullable=False)
     reminder = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
 
     attendant_id = sqlalchemy.Column(sqlalchemy.Integer,
                                      sqlalchemy.ForeignKey('User.id'),
                                      nullable=True)
-    attendant = sqlalchemy.orm.relationship('User')
+    team_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey('Team.id'),
+                                nullable=True)
+    team = sqlalchemy.orm.relationship('Team', back_populates='tasks')
+    attendant = sqlalchemy.orm.relationship('User', back_populates='tasks')

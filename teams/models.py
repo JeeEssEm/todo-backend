@@ -5,7 +5,7 @@ import enum
 
 class Rights(enum.Enum):
     admin = 'admin'
-    user = 'user'
+    member = 'member'
 
 
 UsersTeams = sqlalchemy.Table(
@@ -17,7 +17,7 @@ UsersTeams = sqlalchemy.Table(
                       sqlalchemy.Integer, sqlalchemy.ForeignKey('User.id')),
     sqlalchemy.Column('team_id',
                       sqlalchemy.Integer, sqlalchemy.ForeignKey('Team.id')),
-    sqlalchemy.Column('rights', sqlalchemy.Enum)
+    sqlalchemy.Column('rights', sqlalchemy.Enum(Rights))
 )
 
 
@@ -26,10 +26,11 @@ class Team(Base):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True,
                            index=True, autoincrement=True, nullable=False)
-    title = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
+    title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     owner_id = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey('User.id'))
 
     owner = sqlalchemy.orm.relationship('User')
-    users = sqlalchemy.orm.relationship('User', secondary=UsersTeams,
-                                        back_populates='teams')
+    members = sqlalchemy.orm.relationship('User', secondary=UsersTeams,
+                                          back_populates='teams')
+    tasks = sqlalchemy.orm.relationship('Task')

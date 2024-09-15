@@ -15,4 +15,5 @@ class User(Base):
     token_date_valid = sqlalchemy.Column(sqlalchemy.DateTime)
 
     teams = sqlalchemy.orm.relationship('Team', secondary=UsersTeams,
-                                        back_populates='users')
+                                        back_populates='members')
+    tasks = sqlalchemy.orm.relationship('Task')

@@ -51,9 +51,9 @@ def decode_token(token):
 
 def is_valid_token(token, user):
     try:
-        decode_token(token)
+        token = decode_token(token)
         date = user.token_date_valid
-        if date is not None and date < dt.datetime.utcnow():
+        if date is not None and date.timestamp() > token.get('exp'):
             return False
         return True
     except Exception:
