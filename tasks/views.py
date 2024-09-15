@@ -3,6 +3,7 @@ from users.utils import get_current_user
 from typing import Annotated
 from users.models import User
 from tasks.crud import TaskCRUD
+from tasks.models import TaskStatus, TaskImportance
 from core.responses import Response
 from sqlalchemy.orm import Session
 from core.db import get_db
@@ -105,7 +106,7 @@ async def edit_task(
                 detail='Not enough rights!'
             )
         else:
-            task.xp = form.xp or 10
+            task.xp = form.xp or task.xp
             task.attendant_id = form.attendant_id or task.attendant_id
 
     task.title = form.title or task.title
@@ -123,7 +124,11 @@ async def get_personal_tasks(
         current_user: Annotated[User, fastapi.Depends(get_current_user)],
         db: Annotated[Session, fastapi.Depends(get_db)],
         page: int,
-        limit: int = 10
+        limit: int = 10,
+        status: TaskStatus = None,
+        importance: TaskImportance = None,
         ):
-    tasks = await TaskCRUD.get_personal_tasks(db, current_user.id, page, limit)
+    tasks = await TaskCRUD.get_paginated_personal_tasks(
+        db, current_user.id, page, limit, status=status, importance=importance
+    )
     return Response(tasks=tasks)

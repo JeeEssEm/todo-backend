@@ -14,7 +14,6 @@ class User(Base):
     password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     token_date_valid = sqlalchemy.Column(sqlalchemy.DateTime)
 
-    xp = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     teams = sqlalchemy.orm.relationship('Team', secondary=UsersTeams,
                                         back_populates='members')
     tasks = sqlalchemy.orm.relationship('Task')

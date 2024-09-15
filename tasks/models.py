@@ -7,7 +7,6 @@ class TaskStatus(enum.Enum):
     planning = 'planning'
     running = 'running'
     done = 'done'
-    archived = 'archived'
     cancelled = 'cancelled'
 
 

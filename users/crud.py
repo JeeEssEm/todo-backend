@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from core.security import get_password_hash
 from models import User
+from tasks.models import Task, TaskStatus
 import sqlalchemy
 import datetime as dt
 
@@ -45,3 +46,16 @@ class UserCRUD:
         user.token_date_valid = dt.datetime.utcnow()
         session.add(user)
         session.commit()
+
+    @staticmethod
+    async def get_user_xp(session: Session, user_id: int, team_id: int = None):
+        q = session.query(sqlalchemy.sql.func.sum(Task.xp)).filter(
+            Task.attendant_id == user_id  # noqa
+        ).filter(Task.status == TaskStatus.done)
+        if team_id:
+            q = q.filter(Task.team_id == team_id)
+        res = q.scalar()
+
+        if not res:
+            res = 0
+        return res

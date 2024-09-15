@@ -39,7 +39,9 @@ class TeamCRUD:
         if status:
             q = q.filter(Task.status == status)
         else:
-            q = q.filter(Task.status != TaskStatus.archived)
+            q = q.filter(Task.status != TaskStatus.cancelled).filter(
+                Task.status != TaskStatus.done
+            )
         if importance:
             q = q.filter(Task.importance == importance)
         if attendant_id:

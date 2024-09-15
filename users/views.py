@@ -36,6 +36,14 @@ async def get_user(
     ))
 
 
+@router.get('/{user_id:int}/xp')
+async def get_user_xp(user_id: int,
+                      db: Annotated[Session, fastapi.Depends(get_db)],
+                      team_id: int = None):
+    xp = await UserCRUD.get_user_xp(db, user_id, team_id)
+    return Response(xp=xp)
+
+
 @router.get('/image/{user_id:int}')
 async def get_user_image():
     ...
