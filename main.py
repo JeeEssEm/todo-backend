@@ -8,7 +8,7 @@ from core.exceptions import errors_handler
 app = fastapi.FastAPI(exception_handlers={
     fastapi.exceptions.RequestValidationError: errors_handler,
     ValueError: errors_handler
-})
+}, title='Тудушлёп API', version='0.1')
 app.include_router(auth_router, prefix='/auth', tags=['auth'])
 app.include_router(users_router, prefix='/users', tags=['users'])
 app.include_router(tasks_router, prefix='/tasks', tags=['tasks'])

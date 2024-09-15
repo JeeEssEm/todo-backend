@@ -11,7 +11,8 @@ class UserCRUD:
         return session.query(User).filter(User.id == user_id).first()
 
     @staticmethod
-    async def create_user(session: Session, email: str, username: str, password: str):
+    async def create_user(session: Session, email: str, username: str,
+                          password: str):
         user = User(email=email, username=username,
                     password=get_password_hash(password))
         session.add(user)
@@ -33,7 +34,7 @@ class UserCRUD:
 
     @staticmethod
     async def check_email_username_available(session: Session, email: str,
-                                       username: str):
+                                             username: str):
         return session.query(User).filter(sqlalchemy.or_(
             User.username == username, User.email == email)
         ).first()

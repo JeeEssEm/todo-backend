@@ -18,10 +18,19 @@ async def index(
         current_user: Annotated[User, fastapi.Depends(get_current_user)],
         db: Annotated[Session, fastapi.Depends(get_db)]
 ):
-    tasks = {team.title: team.tasks[:3] for team in current_user.teams}
-    tasks['personal'] = await TaskCRUD.get_personal_tasks(db,
-                                                          current_user.id, 3)
+    tasks = {'teams': current_user.teams,
+             'personal': (await TaskCRUD.get_personal_tasks(
+                 db, current_user.id, 1, 3)).results,
+             'analytics': []}
     return Response(teams=tasks)
+
+
+@router.get('/groups')
+async def groups(
+        current_user: Annotated[User, fastapi.Depends(get_current_user)]
+):
+    tasks = {team.title: team.tasks[:3] for team in current_user.teams}
+    return Response(tasks=tasks)
 
 
 @router.get('/{task_id:int}')
@@ -58,15 +67,16 @@ async def create_task(
         form: Annotated[TaskForm, fastapi.Depends()],
         team_id: int = None):
     attendant_id = None
+    xp = 10
     if team_id is not None:
         if not (await TeamCRUD.check_admin_in_team(
                 db, team_id, current_user.id)):
-            # TODO: different configs in teams
             raise fastapi.exceptions.HTTPException(
                 status_code=fastapi.status.HTTP_403_FORBIDDEN,
                 detail='Not enough rights!'
             )
         else:
+            xp = form.xp
             attendant_id = form.attendant_id
     else:
         attendant_id = current_user.id
@@ -75,7 +85,7 @@ async def create_task(
         db, title=form.title, description=form.description,
         reminder=form.reminder, task_status=form.task_status,
         task_importance=form.task_importance, user_id=attendant_id,
-        team_id=team_id
+        team_id=team_id, xp=xp
     )
     return Response(message='Task created successfully!')
 
@@ -95,6 +105,7 @@ async def edit_task(
                 detail='Not enough rights!'
             )
         else:
+            task.xp = form.xp or 10
             task.attendant_id = form.attendant_id or task.attendant_id
 
     task.title = form.title or task.title
@@ -116,9 +127,3 @@ async def get_personal_tasks(
         ):
     tasks = await TaskCRUD.get_personal_tasks(db, current_user.id, page, limit)
     return Response(tasks=tasks)
-
-
-@router.post('/attend/{task_id}')
-async def attend_to_task():
-    # TODO: ?
-    ...

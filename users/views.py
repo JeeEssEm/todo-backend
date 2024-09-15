@@ -12,11 +12,10 @@ router = fastapi.APIRouter()
 
 
 @router.get('/whoami')
-async def whoami(current_user: Annotated[models.User,
-                                         fastapi.Depends(get_current_user)]):
-    return Response(
-        current_user
-    )
+async def whoami(
+        current_user: Annotated[models.User,
+                                fastapi.Depends(get_current_user)]):
+    return Response(user=current_user)
 
 
 @router.get('/{user_id:int}')

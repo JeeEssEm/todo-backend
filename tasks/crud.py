@@ -10,7 +10,7 @@ class TaskCRUD:
     @staticmethod
     async def get_personal_tasks(session: sqlalchemy.orm.Session, user_id: int,
                                  page: int, limit: int):
-        q = session.query(Task).filter(Task.team_id == None).filter(
+        q = session.query(Task).filter(Task.team_id == None).filter(  # noqa
             Task.attendant_id == user_id
         ).filter(
             Task.status != TaskStatus.archived
@@ -43,11 +43,11 @@ class TaskCRUD:
             session: sqlalchemy.orm.Session,
             title: str, description: str, reminder: dt.datetime,
             task_status: TaskStatus, task_importance: TaskImportance,
-            user_id: int, team_id: int = None):
+            user_id: int, team_id: int = None, xp: int = 10):
         task = Task(
             title=title, description=description, reminder=reminder,
             status=task_status, importance=task_importance,
-            attendant_id=user_id, team_id=team_id
+            attendant_id=user_id, team_id=team_id, xp=xp
         )
         session.add(task)
         session.commit()
@@ -60,7 +60,7 @@ class TaskCRUD:
             importance: TaskImportance = None
     ):
         q = session.query(Task).filter(Task.attendant_id == user_id).filter(
-            Task.team_id == None
+            Task.team_id == None  # noqa
         )
         if status:
             q = q.filter(Task.status == status)

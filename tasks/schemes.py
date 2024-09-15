@@ -12,6 +12,7 @@ class TaskScheme(pydantic.BaseModel):
     task_importance: TaskImportance
     reminder: Optional[dt.datetime] = None
     attendant: Optional[Any] = None
+    xp: Optional[int] = None
 
 
 class TaskForm(pydantic.BaseModel):
@@ -21,3 +22,4 @@ class TaskForm(pydantic.BaseModel):
     task_importance: Optional[TaskImportance] = TaskImportance.regular
     reminder: Optional[dt.datetime] = None
     attendant_id: Optional[int] = None
+    xp: Optional[int] = None

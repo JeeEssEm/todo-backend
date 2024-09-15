@@ -35,5 +35,6 @@ class Task(Base):
     team_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey('Team.id'),
                                 nullable=True)
+    xp = sqlalchemy.Column(sqlalchemy.Integer, default=10)
     team = sqlalchemy.orm.relationship('Team', back_populates='tasks')
     attendant = sqlalchemy.orm.relationship('User', back_populates='tasks')

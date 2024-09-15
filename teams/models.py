@@ -17,7 +17,8 @@ UsersTeams = sqlalchemy.Table(
                       sqlalchemy.Integer, sqlalchemy.ForeignKey('User.id')),
     sqlalchemy.Column('team_id',
                       sqlalchemy.Integer, sqlalchemy.ForeignKey('Team.id')),
-    sqlalchemy.Column('rights', sqlalchemy.Enum(Rights))
+    sqlalchemy.Column('rights', sqlalchemy.Enum(Rights)),
+    sqlalchemy.Column('xp', sqlalchemy.Integer, default=0)
 )
 
 
