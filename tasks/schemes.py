@@ -2,10 +2,10 @@ import pydantic
 from .models import TaskImportance, TaskStatus
 import datetime as dt
 from typing import Optional, Any
-# from users.models import User
 
 
 class TaskScheme(pydantic.BaseModel):
+    id: int
     title: str
     description: Optional[str] = None
     task_status: TaskStatus

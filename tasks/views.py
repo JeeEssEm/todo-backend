@@ -1,5 +1,4 @@
 import json
-
 import fastapi
 from users.utils import get_current_user
 from typing import Annotated

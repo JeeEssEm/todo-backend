@@ -3,15 +3,19 @@ from .schemes import TaskScheme
 
 async def task_scheme_converter(task_obj):
     desc = None
+    date = None
     if task_obj.description is not None:
         desc = task_obj.description[:50] + '...'
+    if task_obj.reminder is not None:
+        date = task_obj.reminder.timestamp()
 
     return TaskScheme(
+        id=task_obj.id,
         title=task_obj.title,
         description=desc,
         task_status=task_obj.status,
         task_importance=task_obj.importance,
-        reminder=task_obj.reminder
+        reminder=date
     )
 
 
