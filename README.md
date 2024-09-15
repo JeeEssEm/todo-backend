@@ -45,7 +45,7 @@ Example of **.env**:
 ```
 DB_URL=sqlite:///./app.db      # url for your database
 SECRET_KEY=jk-asd23asd-asd231  # secret key
-REFRESH_TOKEN_EXPIRE_DAYS=30   # time after which access token will expire
+REFRESH_TOKEN_EXPIRE_DAYS=30   # time after which refresh token will expire
 ACCESS_TOKEN_EXPIRE_MINUTES=30 # time after which access token will expire
 STATIC_PATH=static             # path for static files (images, etc)
 ```
@@ -64,7 +64,7 @@ STATIC_PATH=static             # path for static files (images, etc)
 
 #### 1. Team workspace
 - create/edit team
-- add admins, who can create tasks inside team and assign other members
+- add admins, who can create tasks inside team and assign it to other members
 - separation between personal tasks and team tasks
 - add/kick members
 - set the amount of experience the user will receive if they complete the task

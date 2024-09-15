@@ -8,7 +8,7 @@ from tasks.models import TaskStatus, TaskImportance
 from core.responses import Response
 from sqlalchemy.orm import Session
 from core.db import get_db
-from .schemes import TaskScheme, TaskForm
+from .schemes import TaskScheme, TaskForm, TaskFormEditable
 from users.schemes import UserScheme
 from teams.crud import TeamCRUD
 from .utils import task_json_converter
@@ -101,7 +101,7 @@ async def create_task(
 async def edit_task(
         current_user: Annotated[User, fastapi.Depends(get_current_user)],
         db: Annotated[Session, fastapi.Depends(get_db)],
-        form: Annotated[TaskForm, fastapi.Depends()],
+        form: Annotated[TaskFormEditable, fastapi.Depends()],
         task_id: int):
     task = await TaskCRUD.get_task_by_id(db, task_id)
     if task.team_id is not None:

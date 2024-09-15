@@ -23,3 +23,13 @@ class TaskForm(pydantic.BaseModel):
     reminder: Optional[dt.datetime] = None
     attendant_id: Optional[int] = None
     xp: Optional[int] = None
+
+
+class TaskFormEditable(pydantic.BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    task_status: Optional[TaskStatus] = TaskStatus.planning
+    task_importance: Optional[TaskImportance] = TaskImportance.regular
+    reminder: Optional[dt.datetime] = None
+    attendant_id: Optional[int] = None
+    xp: Optional[int] = None
