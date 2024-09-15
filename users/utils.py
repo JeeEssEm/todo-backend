@@ -5,6 +5,10 @@ from .crud import UserCRUD
 from sqlalchemy.orm import Session
 from core.db import get_db
 from .schemes import UserScheme
+import uuid
+import os
+from config import STATIC_PATH
+import aiofiles
 
 oauth2_scheme = fastapi.security.OAuth2PasswordBearer(tokenUrl='auth/login')
 
@@ -41,3 +45,29 @@ async def user_scheme_converter(user_obj):
         email=user_obj.email,
         id=user_obj.id
     )
+
+
+async def generate_filename(path, ext):
+    filename = str(uuid.uuid4()) + ext
+    while os.path.exists(path / filename):
+        filename = str(uuid.uuid4()) + ext
+    return filename
+
+
+async def save_image(image):
+    path = STATIC_PATH / 'images'
+    filename = await generate_filename(path, '.webp')
+    path = path / filename
+    await save_file(image, path)
+    return filename
+
+
+async def save_file(file, path):
+    async with aiofiles.open(path, 'wb') as out:
+        while content := await file.read(1024):
+            await out.write(content)
+
+
+async def remove_file(path):
+    if os.path.exists(path):
+        os.remove(path)

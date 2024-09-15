@@ -13,6 +13,7 @@ class User(Base):
     username = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
     password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     token_date_valid = sqlalchemy.Column(sqlalchemy.DateTime)
+    image = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     teams = sqlalchemy.orm.relationship('Team', secondary=UsersTeams,
                                         back_populates='members')

@@ -59,3 +59,7 @@ class UserCRUD:
         if not res:
             res = 0
         return res
+
+    @staticmethod
+    async def get_user_image_path(session: Session, user_id: int):
+        return (await UserCRUD.get_user_by_id(session, user_id)).image
