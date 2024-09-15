@@ -43,13 +43,17 @@ async def get_task(
         task_id: int):
     if await TaskCRUD.check_user_can_see(db, current_user.id, task_id):
         task = await TaskCRUD.get_task_by_id(db, task_id)
+        date = None
+        if task.reminder is not None:
+            date = task.reminder.timestamp()
         attendant = task.attendant
+
         return Response(task=TaskScheme(
             title=task.title,
             description=task.description,
             task_importance=task.importance,
             task_status=task.status,
-            reminder=task.reminder,
+            reminder=date,
             attendant=UserScheme(
                 username=attendant.username,
                 email=attendant.email,
@@ -133,6 +137,7 @@ async def get_personal_tasks(
     tasks = await TaskCRUD.get_paginated_personal_tasks(
         db, current_user.id, page, limit, status=status, importance=importance
     )
+
     return Response(tasks=tasks)
 
 
