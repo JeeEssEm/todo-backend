@@ -7,39 +7,39 @@ import datetime as dt
 
 class UserCRUD:
     @staticmethod
-    def get_user_by_id(session: Session, user_id: int):
+    async def get_user_by_id(session: Session, user_id: int):
         return session.query(User).filter(User.id == user_id).first()
 
     @staticmethod
-    def create_user(session: Session, email: str, username: str, password: str):
+    async def create_user(session: Session, email: str, username: str, password: str):
         user = User(email=email, username=username,
                     password=get_password_hash(password))
         session.add(user)
         session.commit()
 
     @staticmethod
-    def get_user_by_username(session: Session, username: str):
+    async def get_user_by_username(session: Session, username: str):
         return session.query(User).filter(User.username == username).first()
 
     @staticmethod
-    def get_user_by_email(session: Session, email: str):
+    async def get_user_by_email(session: Session, email: str):
         return session.query(User).filter(User.email == email).first()
 
     @staticmethod
-    def get_user_by_username_or_email(session: Session, data: str):
+    async def get_user_by_username_or_email(session: Session, data: str):
         return session.query(User).filter(sqlalchemy.or_(
             User.email == data, User.username == data
         )).first()
 
     @staticmethod
-    def check_email_username_available(session: Session, email: str,
+    async def check_email_username_available(session: Session, email: str,
                                        username: str):
         return session.query(User).filter(sqlalchemy.or_(
             User.username == username, User.email == email)
         ).first()
 
     @staticmethod
-    def change_password(session: Session, password: str, user):
+    async def change_password(session: Session, password: str, user):
         user.password = get_password_hash(password)
         user.token_date_valid = dt.datetime.utcnow()
         session.add(user)

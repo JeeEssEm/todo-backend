@@ -22,7 +22,7 @@ async def login(
 ):
     username = form_data.username
     password = form_data.password
-    user = UserCRUD.get_user_by_username_or_email(db, username)
+    user = await UserCRUD.get_user_by_username_or_email(db, username)
 
     if user is None or not core.security.verify_password(
         password, user.password
@@ -73,13 +73,14 @@ async def register(
         form: Annotated[schemes.RegisterForm, fastapi.Depends()],
         db: Session = fastapi.Depends(get_db)):
 
-    if UserCRUD.check_email_username_available(db, form.email, form.username):
+    if await UserCRUD.check_email_username_available(db, form.email,
+                                                     form.username):
         raise fastapi.exceptions.HTTPException(
             status_code=fastapi.status.HTTP_403_FORBIDDEN,
             detail='User already exists!'
         )
 
-    UserCRUD.create_user(db, form.email, form.username, form.password)
+    await UserCRUD.create_user(db, form.email, form.username, form.password)
 
     return Response(detail='User created successfully!')
 
@@ -90,6 +91,6 @@ async def reset_password(
     db: Annotated[Session, fastapi.Depends(get_db)],
     form: Annotated[schemes.ResetPasswordForm, fastapi.Depends()]
 ):
-    UserCRUD.change_password(db, form.password, current_user)
+    await UserCRUD.change_password(db, form.password, current_user)
 
     return Response(detail='Password changed successfully!')

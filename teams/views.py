@@ -2,6 +2,7 @@ import fastapi
 from typing import Annotated
 from users.models import User
 from users.utils import get_current_user
+from tasks.models import TaskImportance, TaskStatus
 from .crud import TeamCRUD
 from core.db import get_db
 from core.responses import Response
@@ -44,10 +45,15 @@ async def get_team_tasks(
         db: Annotated[Session, fastapi.Depends(get_db)],
         team_id: int,
         page: int,
-        limit: int = 10
+        limit: int = 10,
+        status: TaskStatus = None,
+        importance: TaskImportance = None,
+        attendant_id: int = None
 ):
     if TeamCRUD.check_user_in_team(db, current_user.id, team_id):
-        tasks = await TeamCRUD.get_paginated_tasks(db, team_id, page, limit)
+        tasks = await TeamCRUD.get_paginated_tasks(db, team_id, page, limit,
+                                                   status, importance,
+                                                   attendant_id)
         return Response(tasks=tasks)
 
     raise fastapi.exceptions.HTTPException(

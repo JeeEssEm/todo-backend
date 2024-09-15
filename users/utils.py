@@ -15,10 +15,14 @@ async def get_current_user(
 ):
     try:
         data = core.security.decode_token(token)
-        user = UserCRUD.get_user_by_id(db, data.get('id'))
+        user = await UserCRUD.get_user_by_id(db, data.get('id'))
 
         if core.security.is_valid_token(token, user):
             return user
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_401_UNAUTHORIZED,
+            detail='Token is not valid anymore'
+        )
     except Exception:
         raise fastapi.exceptions.HTTPException(
             status_code=fastapi.status.HTTP_401_UNAUTHORIZED,

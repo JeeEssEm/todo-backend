@@ -2,7 +2,7 @@ import sqlalchemy
 from users.models import User
 from teams.models import UsersTeams, Team, Rights
 from pagination.pagination import paginate
-from tasks.models import Task, TaskStatus
+from tasks.models import Task, TaskStatus, TaskImportance
 from tasks.utils import task_scheme_converter
 from users.utils import user_scheme_converter
 
@@ -30,10 +30,21 @@ class TeamCRUD:
 
     @staticmethod
     async def get_paginated_tasks(session: sqlalchemy.orm.Session, team_id: int,
-                                  page: int, limit: int):
-        q = session.query(Task).filter(Task.team_id == team_id).filter(
-            Task.status != TaskStatus.archived
-        )
+                                  page: int, limit: int,
+                                  status: TaskStatus = None,
+                                  importance: TaskImportance = None,
+                                  attendant_id: int = None):
+
+        q = session.query(Task).filter(Task.team_id == team_id)
+        if status:
+            q = q.filter(Task.status == status)
+        else:
+            q = q.filter(Task.status != TaskStatus.archived)
+        if importance:
+            q = q.filter(Task.importance == importance)
+        if attendant_id:
+            q = q.filter(Task.attendant_id == attendant_id)
+
         return await paginate(
             page, q, task_scheme_converter, limit
         )
