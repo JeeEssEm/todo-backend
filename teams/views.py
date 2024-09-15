@@ -115,8 +115,88 @@ async def get_team_members(
         detail='Not enough rights!'
     )
 
-# TODO: kick user
-# TODO: get team users
-# TODO: make admin
-# TODO: remove admin
-# TODO: make owner
+
+@router.post('/{team_id:int}/kick/{user_id:int}')
+async def kick_user(
+        team_id: int,
+        user_id: int,
+        db: Annotated[Session, fastapi.Depends(get_db)],
+        current_user: Annotated[User, fastapi.Depends(get_current_user)],
+):
+    if await TeamCRUD.check_admin_in_team(db, team_id, current_user.id):
+        await TeamCRUD.kick_user(db, team_id, user_id)
+        return Response(message='User kicked')
+
+    raise fastapi.exceptions.HTTPException(
+        status_code=fastapi.status.HTTP_403_FORBIDDEN,
+        detail='Not enough rights!'
+    )
+
+
+@router.post('/{team_id:int}/make-admin/{user_id:int}')
+async def make_admin(
+        db: Annotated[Session, fastapi.Depends(get_db)],
+        current_user: Annotated[User, fastapi.Depends(get_current_user)],
+        team_id: int,
+        user_id: int
+):
+    team = await TeamCRUD.get_team_by_id(db, team_id)
+    if team is None:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='Team not found'
+        )
+    if team.owner_id == current_user.id:
+        await TeamCRUD.make_admin(db, team_id, user_id)
+        return Response(message='User is admin now')
+
+    raise fastapi.exceptions.HTTPException(
+        status_code=fastapi.status.HTTP_403_FORBIDDEN,
+        detail='Not enough rights!'
+    )
+
+
+@router.post('/{team_id:int}/make-member/{user_id:int}')
+async def make_member(
+        db: Annotated[Session, fastapi.Depends(get_db)],
+        current_user: Annotated[User, fastapi.Depends(get_current_user)],
+        team_id: int,
+        user_id: int
+):
+    team = await TeamCRUD.get_team_by_id(db, team_id)
+    if team is None:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='Team not found'
+        )
+    if team.owner_id == current_user.id:
+        await TeamCRUD.make_member(db, team_id, user_id)
+        return Response(message='User is member now')
+
+    raise fastapi.exceptions.HTTPException(
+        status_code=fastapi.status.HTTP_403_FORBIDDEN,
+        detail='Not enough rights!'
+    )
+
+
+@router.post('/{team_id:int}/make-owner/{user_id:int}')
+async def make_owner(
+        db: Annotated[Session, fastapi.Depends(get_db)],
+        current_user: Annotated[User, fastapi.Depends(get_current_user)],
+        team_id: int,
+        user_id: int
+):
+    team = await TeamCRUD.get_team_by_id(db, team_id)
+    if team is None:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='Team not found'
+        )
+    if team.owner_id == current_user.id:
+        await TeamCRUD.make_owner(db, team_id, user_id)
+        return Response(message='User is owner now')
+
+    raise fastapi.exceptions.HTTPException(
+        status_code=fastapi.status.HTTP_403_FORBIDDEN,
+        detail='Not enough rights!'
+    )

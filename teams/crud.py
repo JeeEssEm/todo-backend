@@ -74,3 +74,38 @@ class TeamCRUD:
             UsersTeams.c.team_id == team_id
         ).filter(User.id == UsersTeams.c.user_id)
         return await paginate(page, q, user_scheme_converter, limit)
+
+    @staticmethod
+    async def kick_user(session: sqlalchemy.orm.Session, team_id: int,
+                        user_id: int):
+        q = UsersTeams.delete().where(
+            UsersTeams.c.team_id == team_id
+        ).where(UsersTeams.c.user_id == user_id)
+        session.execute(q)
+        session.commit()
+
+    @staticmethod
+    async def make_admin(session: sqlalchemy.orm.Session, team_id: int,
+                         user_id: int):
+        q = UsersTeams.update().where(
+            UsersTeams.c.team_id == team_id
+        ).where(UsersTeams.c.user_id == user_id).values(rights=Rights.admin)
+        session.execute(q)
+        session.commit()
+
+    @staticmethod
+    async def make_member(session: sqlalchemy.orm.Session, team_id: int,
+                          user_id: int):
+        q = UsersTeams.update().where(
+            UsersTeams.c.team_id == team_id
+        ).where(UsersTeams.c.user_id == user_id).values(rights=Rights.member)
+        session.execute(q)
+        session.commit()
+
+    @staticmethod
+    async def make_owner(session: sqlalchemy.orm.Session, team_id: int,
+                         user_id: int):
+        team = await TeamCRUD.get_team_by_id(session, team_id)
+        team.owner_id = user_id
+        session.add(team)
+        session.commit()
