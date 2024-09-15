@@ -1,6 +1,14 @@
 ![flake8](https://github.com/JeeEssEm/todo-backend/actions/workflows/lint.yml/badge.svg)
 # Backend for TO-DO app
 
+## Team
+
+### 1. [Frontend](https://github.com/TheMerret/todoshlyop)
+#### Харитонов Максим
+### 2. [Mobile](https://github.com/DaniilSukhanov/DevTimeHack_MI-HS-EM_iOS)
+#### Суханов Даниил
+### 3. Backend (this repo)
+#### Морозов Григорий
 # Quick start
 
 ## 1. Docker
@@ -45,11 +53,27 @@ STATIC_PATH=static             # path for static files (images, etc)
 ```uvicorn main:app --reload --host 0.0.0.0 --port 8000```
 
 
-# Team
+## Usage
+### How to open swagger
+> http://{YOUR_IP}:8000/docs
 
-### 1. [Frontend](https://github.com/TheMerret/todoshlyop)
-#### Харитонов Максим
-### 2. [Mobile](https://github.com/DaniilSukhanov/DevTimeHack_MI-HS-EM_iOS)
-#### Суханов Даниил
-### 3. Backend (this repo)
-#### Морозов Григорий
+
+## Some mechanics:
+
+#### 0. Auth (using JWT)
+
+#### 1. Team workspace
+- create/edit team
+- add admins, who can create tasks inside team and assign other members
+- separation between personal tasks and team tasks
+- add/kick members
+- set the amount of experience the user will receive if they complete the task
+
+#### 2. Personal workspace
+
+- create/read/update/delete your tasks
+- set reminder (deadline)
+- set statuses (planning/running/done/cancelled)
+- set importance (regular/important/extremely important) 
+- import/export tasks with json format
+- get 10 xp (experience points) by completing personal tasks

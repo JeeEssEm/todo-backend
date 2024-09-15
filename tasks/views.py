@@ -71,7 +71,7 @@ async def get_task(
 async def create_task(
         current_user: Annotated[User, fastapi.Depends(get_current_user)],
         db: Annotated[Session, fastapi.Depends(get_db)],
-        form: Annotated[TaskForm, fastapi.Depends()],
+        form: Annotated[TaskForm, fastapi.Form()],
         team_id: int = None):
     attendant_id = None
     xp = 10
@@ -123,6 +123,33 @@ async def edit_task(
     db.add(task)
     db.commit()
     return Response(message='Task edited')
+
+
+@router.delete('/{task_id:int}')
+async def delete_task(
+        task_id: int,
+        current_user: Annotated[User, fastapi.Depends(get_current_user)],
+        db: Annotated[Session, fastapi.Depends(get_db)]
+):
+    task = await TaskCRUD.get_task_by_id(db, task_id)
+    if task is None:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail='Task not found'
+        )
+    if task.team_id is None and task.attendant_id == current_user.id:
+        task.delete()
+        db.commit()
+        return Response(message='Task deleted successfully')
+    if TeamCRUD.check_admin_in_team(db, task.team_id, current_user.id):
+        task.delete()
+        db.commit()
+        return Response(message='Task deleted successfully')
+
+    raise fastapi.exceptions.HTTPException(
+        status_code=fastapi.status.HTTP_403_FORBIDDEN,
+        detail='Not enough rights!'
+    )
 
 
 @router.get('')
