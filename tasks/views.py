@@ -1,3 +1,5 @@
+import json
+
 import fastapi
 from users.utils import get_current_user
 from typing import Annotated
@@ -10,6 +12,7 @@ from core.db import get_db
 from .schemes import TaskScheme, TaskForm
 from users.schemes import UserScheme
 from teams.crud import TeamCRUD
+from .utils import task_json_converter
 
 router = fastapi.APIRouter()
 
@@ -132,3 +135,47 @@ async def get_personal_tasks(
         db, current_user.id, page, limit, status=status, importance=importance
     )
     return Response(tasks=tasks)
+
+
+@router.get('/export')
+async def export_data(
+    current_user: Annotated[User, fastapi.Depends(get_current_user)],
+    db: Annotated[Session, fastapi.Depends(get_db)],
+    team_id: int = None
+):
+    if team_id:
+        if not await TeamCRUD.check_admin_in_team(db, team_id, current_user.id):
+            raise fastapi.exceptions.HTTPException(
+                status_code=fastapi.status.HTTP_403_FORBIDDEN,
+                detail='Not enough rights!'
+            )
+    tasks = await TaskCRUD.get_all_tasks(db, current_user.id, team_id)
+    return [await task_json_converter(task) for task in tasks]
+
+
+@router.post('/import')
+async def import_data(
+    current_user: Annotated[User, fastapi.Depends(get_current_user)],
+    db: Annotated[Session, fastapi.Depends(get_db)],
+    data: fastapi.UploadFile,
+    team_id: int = None
+):
+    if team_id:
+        if not await TeamCRUD.check_admin_in_team(db, team_id, current_user.id):
+            raise fastapi.exceptions.HTTPException(
+                status_code=fastapi.status.HTTP_403_FORBIDDEN,
+                detail='Not enough rights!'
+            )
+    try:
+        await TaskCRUD.load_tasks_from_json(
+            db, current_user.id,
+            json.loads((await data.read()).decode()),
+            team_id
+        )
+        return Response(message='Tasks loaded successfully!')
+    except Exception:
+        raise fastapi.exceptions.HTTPException(
+            status_code=fastapi.status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail='Oops, something went wrong... The data in the downloaded '
+                   'file may be corrupted. '
+        )

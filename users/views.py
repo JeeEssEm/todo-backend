@@ -53,7 +53,7 @@ async def get_user_image(
 
     if path:
         path = STATIC_PATH / 'images' / path
-        return fastapi.responses.FileResponse(path, media_type=f'image/webp')
+        return fastapi.responses.FileResponse(path, media_type='image/webp')
     raise fastapi.exceptions.HTTPException(
         status_code=fastapi.status.HTTP_404_NOT_FOUND,
         detail='User does not has image'
@@ -86,4 +86,3 @@ async def remove_user_image(
     db.add(current_user)
     db.commit()
     return Response(message='User image deleted')
-

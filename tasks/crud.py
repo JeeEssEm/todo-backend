@@ -13,8 +13,8 @@ class TaskCRUD:
         q = session.query(Task).filter(Task.team_id == None).filter(  # noqa
             Task.attendant_id == user_id
         ).filter(
-            Task.status != TaskStatus.archived
-        )
+            Task.status != TaskStatus.cancelled
+        ).filter(Task.status != TaskStatus.done)
         if limit:
             q = q.limit(limit)
         return await paginate(page, q, task_scheme_converter, limit)
@@ -72,3 +72,36 @@ class TaskCRUD:
             q = q.filter(Task.importance == importance)
 
         return await paginate(page, q, task_scheme_converter, limit)
+
+    @staticmethod
+    async def get_all_tasks(session: sqlalchemy.orm.Session, user_id: int,
+                            team_id: int = None):
+        q = session.query(Task).filter(Task.attendant_id == user_id)
+        if team_id:
+            q = q.filter(Task.team_id == team_id)
+        return q.all()
+
+    @staticmethod
+    async def load_tasks_from_json(
+            session: sqlalchemy.orm.Session, user_id: int, tasks: list,
+            team_id: int = None):
+        entries = []
+        for e in tasks:
+            date = None
+            if e.get('reminder'):
+                date = dt.datetime.fromtimestamp(e.get('reminder'))
+            t = Task(
+                title=e.get('title'),
+                description=e.get('description'),
+                status=e.get('status') or TaskStatus.planning,
+                importance=e.get('importance') or TaskImportance.regular,
+                xp=e.get('xp') or 10,
+                team_id=team_id,
+                reminder=date
+            )
+            if not team_id:
+                t.attendant_id = user_id
+            entries.append(t)
+
+        session.add_all(entries)
+        session.commit()

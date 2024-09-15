@@ -35,7 +35,6 @@ async def login(
     tokens = core.security.create_tokens(user.id)
     response.set_cookie(key='refresh_token',
                         value=tokens['refresh_token'], httponly=True)
-    response.headers['Authorization'] = f'Bearer {tokens["access_token"]}'
 
     return {
         'access_token': tokens['access_token'],
@@ -70,7 +69,7 @@ async def update_token(request: fastapi.Request, response: fastapi.Response,
     '/register'
 )
 async def register(
-        form: Annotated[schemes.RegisterForm, fastapi.Depends()],
+        form: Annotated[schemes.RegisterForm, fastapi.Form()],
         db: Session = fastapi.Depends(get_db)):
 
     if await UserCRUD.check_email_username_available(db, form.email,
